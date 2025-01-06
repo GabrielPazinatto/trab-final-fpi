@@ -134,7 +134,7 @@ void remap_luminance(Swatch swatch)
     
 }
 
-void match_colors_in_swatch(std::vector<cv::Vec3b*> samples, cv::Mat dst, Swatch swatch){
+void match_colors_in_swatch(std::vector<cv::Vec3b*> samples, Swatch swatch){
     for (int i = 0; i < swatch.grayscale_pixels.size(); i++)
     {
         int lum = (*swatch.grayscale_pixels[i])[0];
@@ -239,19 +239,22 @@ int main(int argc, char *argv[])
     cv::Mat grayscale_img = cv::imread(argv[1]);
     cv::Mat reference_img = cv::imread(argv[2]);
 
+    
+
     if (grayscale_img.empty() || reference_img.empty())
     {
         std::cerr << "Error: Could not open or find the images!" << std::endl;
         return -1;
     }
 
-    cv::Mat res = grayscale_img.clone();
+    cv::Mat grayscale_clone = grayscale_img.clone();
+    cv::Mat reference_clone = reference_img.clone();
+
+    const cv::Mat grayscale_const = grayscale_img.clone();
+    const cv::Mat reference_const = reference_img.clone();
 
     cv::imshow("Grayscale Image", grayscale_img);
     cv::imshow("Reference Image", reference_img);
-
-    cv::Mat grayscale_clone = grayscale_img.clone();
-    cv::Mat reference_clone = reference_img.clone();
 
     cv::setMouseCallback("Reference Image", mouseCallbackReference, &reference_img);
     cv::setMouseCallback("Grayscale Image", mouseCallbackGrayscale, &grayscale_img);
@@ -266,7 +269,6 @@ int main(int argc, char *argv[])
 
     convert_bgr_to_lab(grayscale_img);
     convert_bgr_to_lab(reference_img);
-    convert_bgr_to_lab(res);
     
     int i = 0;
     std::cout << "Remapping luminance..." << std::endl;
@@ -281,15 +283,16 @@ int main(int argc, char *argv[])
     for(Swatch swatch : swatches)
     {
         get_jittered_samples(reference_img, samples, swatch, atoi(argv[3]));
-        match_colors_in_swatch(samples, res, swatch);
+        match_colors_in_swatch(samples, swatch);
         samples.erase(samples.begin(), samples.end());
     }
 
-    cv::cvtColor(reference_img, reference_img, cv::COLOR_Lab2BGR);
-    cv::imshow("Reference Image", reference_img);
+    cv::imshow("Reference Image", reference_const);
+    cv::imshow("Grayscale Image", grayscale_const);
 
     cv::cvtColor(grayscale_img, grayscale_img, cv::COLOR_Lab2BGR);
-    cv::imshow("Grayscale Image", grayscale_img);
+    cv::imshow("Result", grayscale_img);
+    cv::imwrite("result.jpg", grayscale_img);
 
     app.exec();
     return 0;

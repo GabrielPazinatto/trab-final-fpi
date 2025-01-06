@@ -4,5 +4,6 @@
 *.stash
 *.vscode
 *.o
+*.webp
 main
 Makefile

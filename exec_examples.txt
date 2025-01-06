@@ -1,6 +1,7 @@
 make && ./main samples/cube_gc.png samples/floresta2.jpg 30
 make && ./main samples/cat2_gc.png samples/maca.jpg 30
 make && ./main samples/flower_gc.jpg samples/rainbow.png 30
+make && ./main samples/floresta3_gc.jpg samples/floresta2.jpg 5
 
 GLOBAL:
 make && ./main samples/mri_gc.webp samples/floresta.jpg 30 
